@@ -1,8 +1,10 @@
-// Copyright (C) Eric Willisson 2006
-// This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
-// for details
+/* Copyright (C) Eric Willisson 2006-2011
+ * This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
+ * for details */
 #include "eric.h"
 
+/* Return a double-precision representation of the current number of
+ * seconds since the epoch. */
 double
 get_time (void)
 {
@@ -11,41 +13,39 @@ get_time (void)
 	return (tv.tv_sec + tv.tv_usec / 1000000.0);
 }
 
-// old_mkrand requires maxval to be maximum value plus 1
+/* Return a pseudorandom integer from the interval [minval, maxval]. */
 int
-old_mkrand (double minval, double maxval)
-{
-	return (floor ((double)random () / RAND_MAX
-		       * (maxval - minval) + minval));
-}
-
-int
-mkrand (double minval, double maxval)
+mkrand (int minval, int maxval)
 {
 	maxval++;
 	return (floor ((double)random () / RAND_MAX
 		       * (maxval - minval) + minval));
 }
 
+/* Convenience functions to open a file for reading or writing, given
+ * a pointer to a file pointer, and the name.
+ *
+ * Returns 1 on success. If quit is 0, returns 0 on failure. Otherwise,
+ * exits with return code equal to quit on failure. */
 int
-open_read (FILE *f, char *filename, int quit)
+open_read (FILE **f, char *filename, int quit)
 {
-	if ((f = fopen (filename, "r")) == NULL) {
+	if (((*f) = fopen (filename, "r")) == NULL) {
 		printf ("Error. Can't open %s\n", filename);
 		if (quit)
-			exit (1);
+			exit (quit);
 		else
 			return 0;
 	}
 	return 1;
 }
 int
-open_write (FILE *f, char *filename, int quit)
+open_write (FILE **f, char *filename, int quit)
 {
-	if ((f = fopen (filename, "w")) == NULL) {
+	if (((*f) = fopen (filename, "w")) == NULL) {
 		printf ("Error. Can't open %s\n", filename);
 		if (quit)
-			exit (1);
+			exit (quit);
 		else
 			return 0;
 	}
@@ -58,6 +58,9 @@ square (double n)
 	return n * n;
 }
 
+/* Linearlly interpolate value from initial upper and lower bounds to
+ * given upper and lower bounds. Returns to_right if
+ * from_left == from_right. */
 double
 lscale (double val,
 	double from_left, double from_right,
@@ -72,6 +75,8 @@ lscale (double val,
 		+ to_left);
 }
 
+/* As lscale(), but returned value is guaranteed to be in the range
+ * [to_left, to_right]. */
 double
 lscale_clamp (double val,
 	double from_left, double from_right,
@@ -107,6 +112,9 @@ cube (double n)
 	return n * n * n;
 }
 
+/* Uses stdarg to dynamically allocate new array of n integer, floats,
+ * or doubles. Arguments following n are used to initialize array.
+ * Returns NULL on error. */
 int *
 make_arrayi (int n, ...)
 {
@@ -115,6 +123,9 @@ make_arrayi (int n, ...)
 	va_list ap;
 
 	array = calloc (n, sizeof *array);
+	if (array == NULL) {
+		return NULL;
+	}
 	va_start (ap, n);
 
 	for (i = 0; i < n; i++) {
