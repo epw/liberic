@@ -3,3 +3,12 @@ Author: Eric Willisson (ericwillisson@gmail.com)
 This repository stores my libraries for various languages. They are
 broken up by language and by toolkit.
 
+Any given directory will contain a Makefile. Running
+    $ make all
+will compile if necessary, and otherwise build the library in the
+current directory.
+
+Running
+    $ make install
+will install the library to the proper directories under ROOT
+(defaults to /usr/local).

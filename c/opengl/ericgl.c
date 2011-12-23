@@ -764,8 +764,8 @@ turn (float rot_x, float rot_y, float rot_z)
 }
 
 void
-rotating_LookAt (const float center_x, const float center_y,
-		 const float center_z, const float dist, float local_theta)
+rotating_look_at (const float center_x, const float center_y,
+		  const float center_z, const float dist, float local_theta)
 {
 	float x, z;
 
@@ -833,7 +833,7 @@ getpointerpos(int mx, int my, double *pos)
 	pos[2] = z0 * (1 - t) + z1 * t;
 }
 void
-getpointerpos_Zplane(int mx, int my, double *pos)
+getpointerpos_Z0plane(int mx, int my, double *pos)
 {
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -917,7 +917,7 @@ getpointerpos_model_proj_view(int mx, int my, GLdouble *modelview,
 }
 
 void
-makeTexture (GLuint texName, int ImageSize, GLubyte ***Image)
+make_texture (GLuint texName, int ImageSize, GLubyte ***Image)
 {
 	glBindTexture (GL_TEXTURE_2D, texName);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -930,7 +930,7 @@ makeTexture (GLuint texName, int ImageSize, GLubyte ***Image)
 }
 
 void
-drawTextureRectangle (GLuint texName, double *posA, double *posB,
+draw_texture_rectangle (GLuint texName, double *posA, double *posB,
 			double *posC, double *posD)
 {
 	glEnable (GL_TEXTURE_2D);
@@ -1011,7 +1011,7 @@ stroke_string (void *font, char *s)
 }
 
 void
-writePPM (char *filename, int WIDTH, int HEIGHT)
+write_PPM (char *filename, int WIDTH, int HEIGHT)
 {
 	FILE *f;
 	int i;
@@ -1037,10 +1037,10 @@ writePPM (char *filename, int WIDTH, int HEIGHT)
 	sprintf (s, "flipppm /tmp/image.ppm >> %s", filename);
 	system (s);
 }
-		
+
 void
-distanceLookAt (double x, double y, double z, double dist, double theta,
-		double phi)
+distance_look_at (double x, double y, double z, double dist, double theta,
+		  double phi)
 {
 	double pos[3];
 	int yaxis = 1;
@@ -1063,7 +1063,7 @@ distanceLookAt (double x, double y, double z, double dist, double theta,
 			yaxis = 1;
 		}
 	}
-			
+
 	theta = DTOR(theta);
 	phi = DTOR(phi);
 
@@ -1081,7 +1081,7 @@ distanceLookAt (double x, double y, double z, double dist, double theta,
 }
 
 void
-angleLookAt (double x, double y, double z, double theta, double phi)
+angle_look_at (double x, double y, double z, double theta, double phi)
 {
 	gluLookAt (x, y, z,
 		   x + sin (theta) * cos (phi), y + sin (phi),
@@ -1098,8 +1098,6 @@ hypot3d (double x, double y, double z)
 void
 view_look_at (struct view localview)
 {
-	distanceLookAt (localview.pos[X], localview.pos[Y], localview.pos[Z],
-			localview.dist, localview.theta, localview.phi);
+	distance_look_at (localview.pos[X], localview.pos[Y], localview.pos[Z],
+			  localview.dist, localview.theta, localview.phi);
 }
- 
- 

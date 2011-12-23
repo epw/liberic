@@ -52,7 +52,7 @@
  * string_length (): Length in units of given string if rendered with
  *                   draw_string ().
  * turn (): Perform rotations around X, Y, and then Z axes.
- * rotating_LookAt (): Move camera to look at given position, placed
+ * rotating_look_at (): Move camera to look at given position, placed
  *                     dist units away, parallel to the X-Z plane.
  * start_alpha (): Begin alpha blending of elements in scene.
  * stop_alpha (): Stop alpha blending of elements in scene.
@@ -60,23 +60,23 @@
  *                   Z world coordinates for the point on the X-Z
  *                   plane with Y-coordinate pos[Y]. Sets pos[X] and
  *                   pos[Z].
- * getpointerpos_Zplane (): As getpointerpos(), but projects onto X-Y
+ * getpointerpos_Z0plane (): As getpointerpos(), but projects onto Z=0
  *                          plane.
  * getpointerpos_model_proj_view (): As getpointerpos(), and also
  *                                   stores modelview and projection
  *                                   matricies, and viewport.
- * makeTexture (): Create new 2D texture using given name, with
+ * make_texture (): Create new 2D texture using given name, with
  *                 particular size as width and height, and RGBA data
  *                 stored in Image.
- * drawTextureRectangle (): Render simple rectangle with texture
+ * draw_texture_rectangle (): Render simple rectangle with texture
  *                          represented by texName.
  * draw_sphere_fraction (): Render piece of sphere.
  * stroke_string (): Render string using given font and
  *                   glutStrokeCharacter().
- * writePPM (): Save current frame as PPM file.
- * distanceLookAt (): Position camera using point of focus, distance,
+ * write_PPM (): Save current frame as PPM file.
+ * distance_look_at (): Position camera using point of focus, distance,
  *                    theta angle, and phi angle.
- * angleLookAt (): Position camera using camera center, theta angle,
+ * angle_look_at (): Position camera using camera center, theta angle,
  *                 and phi angle.
  * hypot3d (): Third-dimension generalization of the Pythagorean
  *             Theorem.
@@ -140,26 +140,26 @@ void draw_letter (double xsize, double ysize, double zsize, int c);
 void draw_string (double xscale, double yscale, double zscale,float w,char *s);
 double string_length (double xscale, char *s);
 void turn (float rot_x, float rot_y, float rot_z);
-void rotating_LookAt (const float center_x, const float center_y,
+void rotating_look_at (const float center_x, const float center_y,
 		      const float center_z, const float dist,
 		      float local_theta);
 void start_alpha (void);
 void stop_alpha (void);
 void getpointerpos(int mx, int my, double *pos);
-void getpointerpos_Zplane(int mx, int my, double *pos);
+void getpointerpos_Z0plane(int mx, int my, double *pos);
 void getpointerpos_model_proj_view(int mx, int my, GLdouble *modelview,
 				   GLdouble *projection, GLint *viewport,
 				   double *pos);
-void makeTexture (GLuint texName, int ImageSize, GLubyte ***Image);
-void drawTextureRectangle (GLuint texName, double *posA, double *posB,
+void make_texture (GLuint texName, int ImageSize, GLubyte ***Image);
+void draw_texture_rectangle (GLuint texName, double *posA, double *posB,
 			   double *posC, double *posD);
 void draw_sphere_fraction (int solid, double r, double slices, double stacks,
 			   double thetafraction, double phifraction);
 void stroke_string (void *font, char *s);
-void writePPM (char *filename, int WIDTH, int HEIGHT);
-void distanceLookAt (double x, double y, double z, double dist, double theta,
+void write_PPM (char *filename, int WIDTH, int HEIGHT);
+void distance_look_at (double x, double y, double z, double dist, double theta,
 		     double phi);
-void angleLookAt (double x, double y, double z, double theta, double phi);
+void angle_look_at (double x, double y, double z, double theta, double phi);
 double hypot3d (double x, double y, double z);
 
 struct view {
