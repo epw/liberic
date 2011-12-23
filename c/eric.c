@@ -3,8 +3,6 @@
  * for details */
 #include "eric.h"
 
-/* Return a double-precision representation of the current number of
- * seconds since the epoch. */
 double
 get_time (void)
 {
@@ -13,7 +11,6 @@ get_time (void)
 	return (tv.tv_sec + tv.tv_usec / 1000000.0);
 }
 
-/* Return a pseudorandom integer from the interval [minval, maxval]. */
 int
 mkrand (int minval, int maxval)
 {
@@ -22,34 +19,44 @@ mkrand (int minval, int maxval)
 		       * (maxval - minval) + minval));
 }
 
-/* Convenience functions to open a file for reading or writing, given
- * a pointer to a file pointer, and the name.
- *
- * Returns 1 on success. If quit is 0, returns 0 on failure. Otherwise,
- * exits with return code equal to quit on failure. */
-int
-open_read (FILE **f, char *filename, int quit)
+FILE *
+open_read (char *filename, int quit)
 {
-	if (((*f) = fopen (filename, "r")) == NULL) {
+	FILE *f;
+	if ((f = fopen (filename, "r")) == NULL) {
 		printf ("Error. Can't open %s\n", filename);
 		if (quit)
 			exit (quit);
 		else
-			return 0;
+			return NULL;
 	}
-	return 1;
+	return f;
 }
-int
-open_write (FILE **f, char *filename, int quit)
+FILE *
+open_write (char *filename, int quit)
 {
-	if (((*f) = fopen (filename, "w")) == NULL) {
+	FILE *f;
+	if ((f = fopen (filename, "w")) == NULL) {
 		printf ("Error. Can't open %s\n", filename);
 		if (quit)
 			exit (quit);
 		else
-			return 0;
+			return NULL;
 	}
-	return 1;
+	return f;
+}
+FILE *
+open_append (char *filename, int quit)
+{
+	FILE *f;
+	if ((f = fopen (filename, "a")) == NULL) {
+		printf ("Error. Can't open %s\n", filename);
+		if (quit)
+			exit (quit);
+		else
+			return NULL;
+	}
+	return f;
 }
 
 double
@@ -57,10 +64,12 @@ square (double n)
 {
 	return n * n;
 }
+double
+cube (double n)
+{
+	return n * n * n;
+}
 
-/* Linearlly interpolate value from initial upper and lower bounds to
- * given upper and lower bounds. Returns to_right if
- * from_left == from_right. */
 double
 lscale (double val,
 	double from_left, double from_right,
@@ -75,8 +84,6 @@ lscale (double val,
 		+ to_left);
 }
 
-/* As lscale(), but returned value is guaranteed to be in the range
- * [to_left, to_right]. */
 double
 lscale_clamp (double val,
 	double from_left, double from_right,
@@ -106,15 +113,6 @@ lscale_clamp (double val,
 
 }
 
-double
-cube (double n)
-{
-	return n * n * n;
-}
-
-/* Use stdarg to dynamically allocate new array of n integer, floats,
- * or doubles. Arguments following n are used to initialize array.
- * Returns NULL on error. */
 int *
 make_arrayi (int n, ...)
 {
@@ -177,8 +175,6 @@ make_arrayd (int n, ...)
 	return array;
 }
 
-/* Return the sign of an integer or double, as 1 or -1. Treats 0
- * as positive. */
 int
 signi (int n)
 {
@@ -186,7 +182,7 @@ signi (int n)
 		return -1;
 	return 1;
 }
-int
+double
 signd (double n)
 {
 	if (n < 0)
@@ -194,16 +190,12 @@ signd (double n)
 	return 1.0;
 }
 
-/* Read in file line by line, checking whether any line matches s
- * with strcmp(). Returns line number of first matched line that is
- * found, or -1 if no match exists. Will not work on files with
- * lines with more than 1000 characters between newlines. */
 int
 find_line (FILE *f, char *s)
 {
 	int line;
 	char c;
-	char buf[1000];
+	char buf[_ERIC_H_MAX_LINE_LENGTH];
 
 	line = -1;
 
@@ -218,16 +210,12 @@ find_line (FILE *f, char *s)
 	return -1;
 }
 
-/* Reads in file to search for specific string as substring within a
- * line. Returns number of characters read before match was found, or
- * -1 if no match exists. Will not work on files with lines with more
- * than 1000 characters between newlines. */
 int
 find_string (FILE *f, char *s)
 {
 	int char_num;
 	char c;
-	char buf[1000];
+	char buf[_ERIC_H_MAX_LINE_LENGTH];
 	char *str;
 
 	char_num = 0;
@@ -246,7 +234,7 @@ find_string (FILE *f, char *s)
 }
 
 int
-append_piece (char *p, char *start, char *delim, int num, char ***pieces)
+append_piece (char *p, char *start, int num, char ***pieces)
 {
 	char *piece;
 
@@ -259,8 +247,6 @@ append_piece (char *p, char *start, char *delim, int num, char ***pieces)
 	return num;
 }
 
-/* Split a string on given DELIMinator, allocating new array of pointers
- * to character arrays to store each piece. */
 char **
 strsplit (char *string, char *delim)
 {
@@ -269,14 +255,14 @@ strsplit (char *string, char *delim)
 
 	for (p = string; (*p) != '\0'; p++) {
 		if ((strncmp (p, delim, strlen (delim))) == 0) {
-			num = append_piece (p, start, delim, num, &pieces);
+			num = append_piece (p, start, num, &pieces);
 
 			p += strlen (delim);
 			start = p;
 		}
 	}
 
-	num = append_piece (p, start, delim, num, &pieces);
+	num = append_piece (p, start, num, &pieces);
 
 	num++;
 	pieces = xrealloc (pieces, num * (sizeof *pieces));
@@ -285,8 +271,6 @@ strsplit (char *string, char *delim)
 	return pieces;
 }
 
-/* This should be used instead of calloc(). It ensures that the memory actually
- * was allocated, and prints an error and aborts immediately if it wasn't. */
 void *
 xcalloc (size_t nmemb, size_t size)
 {
@@ -301,8 +285,6 @@ xcalloc (size_t nmemb, size_t size)
 	return mem;
 }
 
-/* This should be used instead of malloc(). It ensures that the memory actually
- * was allocated, and prints an error and aborts immediately if it wasn't. */
 void *
 xmalloc (size_t size)
 {
@@ -317,8 +299,6 @@ xmalloc (size_t size)
 	return mem;
 }
 
-/* This should be used instead of realloc(). It ensures that the memory actually
- * was allocated, and prints an error and aborts immediately if it wasn't. */
 void *
 xrealloc (void *ptr, size_t size)
 {
