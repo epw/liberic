@@ -1,6 +1,7 @@
-// Copyright (C) Eric Willisson 2004
-// This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
-// for details
+/* Copyright (C) Eric Willisson 2006-2011
+ * This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
+ * for details
+ */
 #include "ericsdlgl.h"
 
 void

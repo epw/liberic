@@ -27,7 +27,6 @@ update_rect (struct rectangle *rect)
 	rect->center[Y] = rect->y + rect_h(*rect)/2;
 }
 
-/* Make new rectangle with corners (x, y) and (x2, y2) */
 struct rectangle
 make_rect_x_y (int x, int y, int x2, int y2)
 {
@@ -42,21 +41,17 @@ make_rect_x_y (int x, int y, int x2, int y2)
 
 	return rect;
 }
-/* Make new rectangle with upper-left corner (x, y), width w,
- * and height h. */
 struct rectangle
 make_rect_w_h (int x, int y, int w, int h)
 {
 	return make_rect_x_y (x, y, x + w, y + h);
 }
-/* Make new rectangle with same size and position as sdlrect. */
 struct rectangle
 sdl_to_rect (SDL_Rect sdlrect)
 {
 	return make_rect_w_h (sdlrect.x, sdlrect.y, sdlrect.w, sdlrect.h);
 }
 
-/* Move rectangle by dx pixels right and dy pixels down. */
 void
 move_rect (struct rectangle *rect, int dx, int dy)
 {
@@ -68,20 +63,17 @@ move_rect (struct rectangle *rect, int dx, int dy)
 	update_rect (rect);
 }
 
-/* Return width of rectangle. */
 int
 rect_w (struct rectangle rect)
 {
 	return rect.x2 - rect.x;
 }
-/* Return height of rectangle. */
 int
 rect_h (struct rectangle rect)
 {
 	return rect.y2 - rect.y;
 }
 
-/* Convert rectangle to instance of SDL_Rect */
 SDL_Rect
 rect_to_sdl (struct rectangle rect)
 {

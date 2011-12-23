@@ -1,13 +1,97 @@
+/* Copyright (C) Eric Willisson 2006-2011
+ * This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
+ * for details
+ *
+ * This library contains a variety of functions which have been found
+ * to be useful when writing in C. It also ensures that a large number
+ * of header files are included by default.
+ *
+ * CONSTANTS
+ * X, Y, Z: Enumerated to allow three-element arrays to be indexed
+ *          with coordinates.
+ * SOLID: Used to note when quadric object should represent filled
+ *        polygons.
+ * WIRE: Used to note when quadric object should represent
+ *       wireframes.
+ *
+ * VARIABLES
+ * red, orange yellow green, blue, magenta, black, darkgray, gray,
+ *     lightgray, brown, none, white, shiny, dull, diffuse_default,
+ *     ambient_default: Material values
+ * libview: The view structure (see below) accessed by default in the
+ *          library.
+ *
+ * STRUCTURES
+ * view: Representation of a camera position for a camera looking at a
+ *       given point.
+ *
+ * FUNCTIONS
+ * init_gl (): Initialize OpenGL and GLUT.
+ * vadd (): Add two vectors and put the result in out.
+ * vsub (): Subtract two vectors and put the result in out.
+ * vdot (): Return dot product of two vectors.
+ * vset (): Set three elements of vector to values given.
+ * vmul (): Multiply vector by constant and put the result in out.
+ * check_sphere_collision (): Return whether two spheres with given
+ *                            positions and radii will collide given
+ *                            their velocity vectors.
+ * grid (): Render a simple grid, with or without lighting enabled,
+ *          with a given shade of gray, and with or without colored
+ *          edge- and center-lines.
+ * colorless_grid (): Render a simple grid with no color information
+ *                    included.
+ * small_grid (): Render a 1x1 unit grid.
+ * set_color (): Use glMaterialf() and glMaterialfv() to set
+ *               GL_AMBIENT, GL_DIFFUSE, GL_SPECULAR, and
+ *               GL_SHININESS.
+ * output (): Draw string to window directly.
+ * draw_letter (): Draw single letter in scene, according to simple
+ *                 library font.
+ * draw_string (): Draw string in scene, using draw_letter()
+ *                 repeatedly.
+ * string_length (): Length in units of given string if rendered with
+ *                   draw_string ().
+ * turn (): Perform rotations around X, Y, and then Z axes.
+ * rotating_LookAt (): Move camera to look at given position, placed
+ *                     dist units away, parallel to the X-Z plane.
+ * start_alpha (): Begin alpha blending of elements in scene.
+ * stop_alpha (): Stop alpha blending of elements in scene.
+ * getpointerpos (): Take screen coordinates (mx, my) and return X and
+ *                   Z world coordinates for the point on the X-Z
+ *                   plane with Y-coordinate pos[Y]. Sets pos[X] and
+ *                   pos[Z].
+ * getpointerpos_Zplane (): As getpointerpos(), but projects onto X-Y
+ *                          plane.
+ * getpointerpos_model_proj_view (): As getpointerpos(), and also
+ *                                   stores modelview and projection
+ *                                   matricies, and viewport.
+ * makeTexture (): Create new 2D texture using given name, with
+ *                 particular size as width and height, and RGBA data
+ *                 stored in Image.
+ * drawTextureRectangle (): Render simple rectangle with texture
+ *                          represented by texName.
+ * draw_sphere_fraction (): Render piece of sphere.
+ * stroke_string (): Render string using given font and
+ *                   glutStrokeCharacter().
+ * writePPM (): Save current frame as PPM file.
+ * distanceLookAt (): Position camera using point of focus, distance,
+ *                    theta angle, and phi angle.
+ * angleLookAt (): Position camera using camera center, theta angle,
+ *                 and phi angle.
+ * hypot3d (): Third-dimension generalization of the Pythagorean
+ *             Theorem.
+ * view_look_at (): Apply distanceLookAt to a view structure.
+ */
+
+#ifndef _ERICGL_H_
+#define _ERICGL_H_
+
 #include <eric.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
 #include <GL/freeglut.h>
-
-#ifndef ERICGL_H
-
-#define ERICGL_H
 
 enum { X, Y, Z };
 

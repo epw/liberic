@@ -1,6 +1,48 @@
 /* Copyright (C) Eric Willisson 2006-2011
  * This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
- * for details */
+ * for details
+ *
+ * This library contains a variety of tools which have been found
+ * to be useful when writing with SDL in C. It also ensures that the
+ * most useful SDL header files are included by default.
+ *
+ * CONSTANTS
+ * X, Y: 0 and 1, to allow two-element arrays for storing positions to
+ *       be indexed with [X] and [Y].
+ *
+ * VARIABLES
+ * screen: The surface representing the main window allocated by the
+ *         system.
+ * library_width: The width of the window.
+ * library_height: The height of the window.
+ * red, orange, yellow, green, blue, purple, black, white: Color
+ *         constants.
+ *
+ * STRUCTURES
+ * rectangle: A flexible structure representing a rectangle. Fields
+ *            store pixel values for coordinates, and should be
+ *            treated as read-only in client programs. They can be
+ *            altered through library functions.
+ *
+ * FUNCTIONS
+ * make_rect_x_y (): Allocate new rectangle structure for the
+ *                   rectangle with corners (x, y) and (x2, y2).
+ * make_rect_w_h (): Allocate new rectangle structure for the
+ *                   rectangle with corners (x, y) and (x+w, y+h).
+ * sdl_to_rect (): Convert SDL_Rect to rectangle structure.
+ * move_rect (): Update rectangle to be moved dx pixels right and dy
+ *               pixels down.
+ * rect_w (): Return width of the rectangle.
+ * rect_h (): Return height of the rectangle.
+ * rect_to_sdl (): Convert rectangle structure to SDL_Rect.
+ * start_sdl (): Set up SDL library. Create window with given size and
+ *               flags, and sets library variables.
+ * draw_blit (): Blit surface to (x, y) on screen.
+ * draw_rect (): Draw rectangle (outline only)
+ * draw_box (): Draw rectangle (filled)
+ * draw_text (): Draw string with given font with upper left corner at
+ *               (x, y) using color.
+ */
 
 #ifndef _ERICSDL_H_
 #define _ERICSDL_H_
@@ -11,16 +53,11 @@
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_gfxPrimitives.h>
 
-/* Allow two-dimensional arrays to easily be indexed to reference X
- * and Y coordinates. */
 enum {
 	X = 0,
 	Y = 1,
 };
 
-/* Type to represent a rectangle. Fields should be treated as read-only,
- * and only altered through given functions. Left, right, top, and bottom
- * give coordinates in pixels of the named sides. */
 struct rectangle {
 	int x, y;
 	int x2, y2;
@@ -37,14 +74,10 @@ int rect_w (struct rectangle rect);
 int rect_h (struct rectangle rect);
 SDL_Rect rect_to_sdl (struct rectangle rect);
 
-/* Library variable to allow all functions to rely on the single
- * window surface. */
 SDL_Surface *screen;
 
-/* Set by start_sdl */
 int library_width, library_height;
 
-/* Contain common color values */
 Uint32 red;
 Uint32 orange;
 Uint32 yellow;

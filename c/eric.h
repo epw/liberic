@@ -4,7 +4,7 @@
  *
  * This library contains a variety of functions which have been found
  * to be useful when writing in C. It also ensures that a large number
- * of files are included by default.
+ * of header files are included by default.
  *
  * MACROS:
  * DTOR(x) - Convert degrees to radians
