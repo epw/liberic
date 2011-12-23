@@ -112,7 +112,7 @@ cube (double n)
 	return n * n * n;
 }
 
-/* Uses stdarg to dynamically allocate new array of n integer, floats,
+/* Use stdarg to dynamically allocate new array of n integer, floats,
  * or doubles. Arguments following n are used to initialize array.
  * Returns NULL on error. */
 int *
@@ -143,6 +143,9 @@ make_arrayf (int n, ...)
 	va_list ap;
 
 	array = calloc (n, sizeof *array);
+	if (array == NULL) {
+		return NULL;
+	}
 	va_start (ap, n);
 
 	for (i = 0; i < n; i++) {
@@ -160,6 +163,10 @@ make_arrayd (int n, ...)
 	va_list ap;
 
 	array = calloc (n, sizeof *array);
+	if (array == NULL) {
+		return NULL;
+	}
+
 	va_start (ap, n);
 
 	for (i = 0; i < n; i++) {
@@ -170,6 +177,8 @@ make_arrayd (int n, ...)
 	return array;
 }
 
+/* Return the sign of an integer or double, as 1 or -1. Treats 0
+ * as positive. */
 int
 signi (int n)
 {
@@ -181,44 +190,59 @@ int
 signd (double n)
 {
 	if (n < 0)
-		return -1;
-	return 1;
+		return -1.0;
+	return 1.0;
 }
 
-char *
+/* Read in file line by line, checking whether any line matches s
+ * with strcmp(). Returns line number of first matched line that is
+ * found, or -1 if no match exists. Will not work on files with
+ * lines with more than 1000 characters between newlines. */
+int
 find_line (FILE *f, char *s)
 {
+	int line;
 	char c;
 	char buf[1000];
-	char *str;
+
+	line = -1;
 
 	while ((c = getc (f)) != EOF) {
 		ungetc (c, f);
+		line++;
 		fgets (buf, sizeof buf, f);
 		if ((strcmp (buf, s)) == 0) {
-			str = calloc (1, sizeof *str);
-			return str;
+			return line;
 		}
 	}
-	return NULL;
+	return -1;
 }
 
-char *
+/* Reads in file to search for specific string as substring within a
+ * line. Returns number of characters read before match was found, or
+ * -1 if no match exists. Will not work on files with lines with more
+ * than 1000 characters between newlines. */
+int
 find_string (FILE *f, char *s)
 {
+	int char_num;
 	char c;
 	char buf[1000];
 	char *str;
 
+	char_num = 0;
 	while ((c = getc (f)) != EOF) {
 		ungetc (c, f);
 		fgets (buf, sizeof buf, f);
 		str = strstr (buf, s);
 		if (str != NULL) {
-			return str;
+			/* Must add distance into line that substring
+			 * begins. */
+			return char_num + (str - buf);
 		}
+		char_num += strlen(buf);
 	}
-	return NULL;
+	return -1;
 }
 
 int
@@ -235,6 +259,8 @@ append_piece (char *p, char *start, char *delim, int num, char ***pieces)
 	return num;
 }
 
+/* Split a string on given DELIMinator, allocating new array of pointers
+ * to character arrays to store each piece. */
 char **
 strsplit (char *string, char *delim)
 {

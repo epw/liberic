@@ -33,8 +33,8 @@
 double get_time (void);
 int mkrand (int minval, int maxval);
 
-int open_read (FILE *f, char *filename, int quit);
-int open_write (FILE *f, char *filename, int quit);
+int open_read (FILE **f, char *filename, int quit);
+int open_write (FILE **f, char *filename, int quit);
 
 double square (double n);
 
@@ -52,8 +52,8 @@ double *make_arrayd (int n, ...);
 int signi (int n);
 int signd (double n);
 
-char *find_line (FILE *f, char *s);
-char *find_string (FILE *f, char *s);
+int find_line (FILE *f, char *s);
+int find_string (FILE *f, char *s);
 
 char **strsplit (char *string, char *delim);
 
