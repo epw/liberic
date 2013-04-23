@@ -70,7 +70,7 @@
 	   :ncr
 	   :npr
 	   :fac))
-	     
+
 (in-package :eric)
 
 (defun not-found (pkg)
@@ -94,7 +94,7 @@
 		      (lambda (c)
 			(declare (ignore c))
 			(invoke-restart 'muffle-warning))))
-	  (asdf:oos 'asdf:load-op pkg)))))
+	(asdf:oos 'asdf:load-op pkg)))))
 
 (defmacro assign (var form &body bdoy)
   "Syntactic sugar for let using only one variable, and returning it"
@@ -149,15 +149,15 @@ Returns a string of the process' output unless output-stream-p is t, in which
 case a string-output-stream is returned."
   #+abcl (declare (ignore command args input output-stream-p))
   #-abcl (let* ((words (split command))
-	    (executable (first words))
-	    (args (append (rest words) args))
-	    (stdin (if (stringp input) (make-string-input-stream input) input))
-	    (stdout (if output-stream-p :stream
-			(make-string-output-stream))))
-       (assign process (sb-ext:run-program executable args :input stdin
-					   :output stdout :search t)
-	 (if output-stream-p (sb-ext:process-output process)
-	     (get-output-stream-string stdout)))))
+		(executable (first words))
+		(args (append (rest words) args))
+		(stdin (if (stringp input) (make-string-input-stream input) input))
+		(stdout (if output-stream-p :stream
+			    (make-string-output-stream))))
+	   (let ((process (sb-ext:run-program executable args :input stdin
+					      :output stdout :search t)))
+	     (if output-stream-p (sb-ext:process-output process)
+		 (get-output-stream-string stdout)))))
 
 (defun get-all-symbols (&optional (package *package*))
   "Returns a list of two lists. First, all symbols which correspond to
@@ -235,21 +235,21 @@ every time it is called it returns the next line (subject to upgrading)"
 		  (t (e) (progn (close file)
 				(error e)))))
      file)))
-		   
+
 
 (defun write-to-file (filespec fmt &rest fmt-args)
   "Append string (format style) to file identified by path."
   (assign string (apply #'format (append (list nil fmt) fmt-args))
-	  (fopen (file filespec :a)
-	    (format file string))
-	  string))
+    (fopen (file filespec :a)
+      (format file string))
+    string))
 
 (defun overwrite-to-file (filespec fmt &rest fmt-args)
   "Write string (format style) to file identified by path."
   (assign string (apply #'format (append (list nil fmt) fmt-args))
-	  (fopen (file filespec :w)
-	    (format file string))
-	  string))
+    (fopen (file filespec :w)
+      (format file string))
+    string))
 
 (defmacro var-output (variable &optional (tabbing 0))
   "Print out a symbol and the value of the variable bound to it."
@@ -306,7 +306,7 @@ and END as string bounds."
       (if end
 	  (ppcre:scan-to-strings regex target-string :start start :end end)
 	  (ppcre:scan-to-strings regex target-string :start start))))
-  
+
 (def-if-pkg :ppcre
     (defun strsub (original old new)
       "CL-PPCRE wrapper for regex-replace-all. Takes original string, regular
@@ -460,11 +460,11 @@ belong to, and maps the slots with CLASS-SLOT-DEF"
   (mapcar (lambda (slot) (class-slot-def slot class-name)) slots))
 
 (defmacro defclass-structure-form (name direct-superclasses
-					 &rest direct-slots)
+				   &rest direct-slots)
   "Defines a class, but with automatic initargs and accessors as a
 structure would have."
-	`(defclass ,name ,direct-superclasses
-	   ,(class-slots-def direct-slots name)))
+  `(defclass ,name ,direct-superclasses
+     ,(class-slots-def direct-slots name)))
 
 (defun print-hash (hash)
   "Print out a hash table, as key/value pairs."
@@ -561,7 +561,7 @@ structure would have."
     (defun socket-format (socket control-string &rest format-arguments)
       "Write data to a socket, formatted with FORMAT."
       (apply #'format (cons (usocket:socket-stream socket)
-			      (cons control-string format-arguments)))
+			    (cons control-string format-arguments)))
       (force-output (usocket:socket-stream socket))))
 
 (def-if-pkg :usocket
