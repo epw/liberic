@@ -16,4 +16,4 @@
   :author "Eric Willisson"
   :description "Library of useful functions"
   :components ((:file "eric"))
-  :depends-on (cl-ppcre split-sequence drakma))
+  :depends-on (cl-ppcre usocket))

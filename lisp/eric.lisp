@@ -6,7 +6,7 @@
 ;; programs
 
 (eval-when (:compile-toplevel)
-  (dolist (pkg '(:cl-ppcre :split-sequence :drakma :usocket))
+  (dolist (pkg '(:cl-ppcre :usocket))
     (handler-case (asdf:oos 'asdf:load-op pkg)
       (asdf:missing-component (c) (declare (ignore c)) nil))))
 
@@ -526,25 +526,25 @@ structure would have."
   ((status :initarg :status :reader status)
    (reason :initarg :reason :reader reason)))
 
-(def-if-pkg :drakma
-    (defun get-internet-file (uri)
-      "Return a file from the Internet, designated by uri, and cache it. If the cached file already exists, do not perform an HTTP lookup, and just return the filename of the cached version."
-      (let ((filename (subseq uri (1+ (position #\/ uri :from-end t)))))
-	(if (string= filename "") (setf filename "index.html"))
-	(if (not (probe-file filename))
-	    (multiple-value-bind (data status headers response-uri stream
-				       needs-close-p reason)
-		(drakma:http-request uri)
-	      (declare (ignore headers response-uri stream needs-close-p))
-	      (if (= status 200)
-		  (eric:fopen (f filename :w
-				 :element-type (typecase data
-						 (string 'base-char)
-						 (vector '(unsigned-byte
-							   8))))
-		    (write-sequence data f))
-		  (error 'http-error :status status :reason reason))))
-	filename)))
+;; (def-if-pkg :drakma
+;;     (defun get-internet-file (uri)
+;;       "Return a file from the Internet, designated by uri, and cache it. If the cached file already exists, do not perform an HTTP lookup, and just return the filename of the cached version."
+;;       (let ((filename (subseq uri (1+ (position #\/ uri :from-end t)))))
+;; 	(if (string= filename "") (setf filename "index.html"))
+;; 	(if (not (probe-file filename))
+;; 	    (multiple-value-bind (data status headers response-uri stream
+;; 				       needs-close-p reason)
+;; 		(drakma:http-request uri)
+;; 	      (declare (ignore headers response-uri stream needs-close-p))
+;; 	      (if (= status 200)
+;; 		  (eric:fopen (f filename :w
+;; 				 :element-type (typecase data
+;; 						 (string 'base-char)
+;; 						 (vector '(unsigned-byte
+;; 							   8))))
+;; 		    (write-sequence data f))
+;; 		  (error 'http-error :status status :reason reason))))
+;; 	filename)))
 
 (defun name-of-weekday (day-of-week)
   "Convert a number from 0 to 6 into a 3 or 4 character abbreviation of a weekday."
