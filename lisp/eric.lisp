@@ -53,6 +53,7 @@
 	   :unsert
 	   :swap
 	   :[]
+	   :[]?
 	   :print-hash
 	   :lookup
 	   :defclass-structure-form
@@ -485,6 +486,14 @@ structure would have."
   (if (null (first args)) object
       (apply #'[] (lookup object (first args)) (rest args))))
 
+(defun []? (object &rest args)
+  "As [], but if any element returns NIL, whole function returns NIL."
+  (if (null (first args)) object
+      (let ((lookup (lookup object (first args))))
+	(if lookup
+	    (apply #'[] lookup (rest args))
+	    nil))))
+
 (defgeneric lookup (object index)
   (:documentation "Actual generic function called by []. Can be extended to new types with methods. Specific methods are already defined for objects, structures, sequences, multidimensional arrays, alists and plists, and hashes."))
 
@@ -501,8 +510,12 @@ structure would have."
 (defmethod lookup ((object list) (index symbol))
   (if (listp (first object)) (assoc index object)
       (getf object index)))
+(defmethod lookup ((object list) (index string))
+  (cdr (assoc index object :test #'equal)))
 (defmethod lookup ((object hash-table) index)
   (gethash index object))
+(defmethod lookup (object (index function))
+  (funcall index object))
 
 (defun factor (n)
   "Return all factors of n in a list."
