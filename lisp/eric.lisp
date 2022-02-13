@@ -616,9 +616,8 @@ structure would have."
 	((= n 1) 1)
 	(t (* n (fac (1- n))))))
 
-(defun npr (n k)
+(defun npr (n r)
   "Compute number of permutations of k elements out of n."
-  (if (= n k) 1
-      (* n (npr (1- n) k))))
+  (reduce #'* (loop :for i :from (max (- n r) 1) :to n :collect i) :start 1))
 
 (provide :eric)
