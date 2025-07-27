@@ -3,6 +3,7 @@
 (defpackage :eric-test
   (:use :cl)
   (:export :*deftests*
+	   :*test-output*
 	   :deftest
 	   :run-test
 	   :run-all-tests))
@@ -14,6 +15,12 @@
 ;; file will run all the unit tests.
 
 (defvar *deftests* nil "Tests defined by deftest in this session.")
+
+(defvar *test-output*
+  (if (boundp 'cl-user::*eric-test-output*)
+      (eval 'cl-user::*eric-test-output*)
+      t)
+  "Output stream to write to. T for stdout. Override before loading with CL-USER::*ERIC-TEST-OUTPUT*")
 
 (defun run-test (tested-function)
   (funcall (getf *deftests* tested-function)))
@@ -35,9 +42,9 @@ ARGS is currently unused, but provided for forward compatibility.
     `(let ((,fname ',tested-function))
        (setf (getf *deftests* ,fname)
 	   (lambda ,args
-	     (format t "~&Testing ~a: " ,fname)
+	     (format *test-output* "~&Testing ~a: " ,fname)
 	     ,@body
-	     (format t "~a~%" t)
+	     (format *test-output* "~a~%" t)
 	     T))
        (run-test ,fname))))
 
