@@ -3,7 +3,8 @@
 (defpackage :eric-test
   (:use :cl)
   (:export :*deftests*
-	   :*test-output*
+   :*test-output*
+   :*silent-packages*
 	   :deftest
 	   :run-test
 	   :run-all-tests))
@@ -22,11 +23,18 @@
       t)
   "Output stream to write to. T for stdout. Override before loading with CL-USER::*ERIC-TEST-OUTPUT*")
 
+(defvar *silent-packages* '(:eric-test)
+  "Packages which, when compiled, should never use *test-output*. Packages may add themselves dynamically.")
+
 (defun run-test (tested-function)
   (funcall (getf *deftests* tested-function)))
 
 (defun run-all-tests ()
   (loop :for test :in *deftests* :by #'cddr :collect (funcall (getf *deftests* test))))
+
+(defun testing-format (fmt-string &rest args)
+  (unless (member (intern (package-name *package*) :keyword) *silent-packages*)
+    (apply #'format *test-output* fmt-string args)))
 
 (defmacro deftest (tested-function args &body body)
   "DEFTEST helps define very simple unit tests.
@@ -42,9 +50,9 @@ ARGS is currently unused, but provided for forward compatibility.
     `(let ((,fname ',tested-function))
        (setf (getf *deftests* ,fname)
 	   (lambda ,args
-	     (format *test-output* "~&Testing ~a: " ,fname)
+	     (testing-format "~&Testing ~a: " ,fname)
 	     ,@body
-	     (format *test-output* "~a~%" t)
+	     (testing-format "~a~%" t)
 	     T))
        (run-test ,fname))))
 

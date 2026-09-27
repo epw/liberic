@@ -1,4 +1,4 @@
-;; Copyright (C) Eric Willisson 2011
+;; Copyright (C) Eric Willisson 2011-2026
 ;; This library uses the GPL; see http://www.gnu.org/copyleft/gpl.html
 ;; for details
 
@@ -6,12 +6,12 @@
 ;; programs
 
 (eval-when (:compile-toplevel)
-  (dolist (pkg '(:cl-ppcre :usocket))
+  (dolist (pkg '(:sb-alien :cl-ppcre :usocket :eric-test))
     (handler-case (asdf:oos 'asdf:load-op pkg)
       (asdf:missing-component (c) (declare (ignore c)) nil))))
 
 (defpackage :eric
-  (:use :cl)
+  (:use :cl :sb-alien)
   (:export :include
 	   :def-if-pkg
 	   :not-found
@@ -70,9 +70,12 @@
 	   :finish-later
 	   :ncr
 	   :npr
-	   :fac))
+	   :fac
+	   :strptime))
 
 (in-package :eric)
+
+(pushnew :eric eric-test:*silent-packages*)
 
 (defun not-found (pkg)
   "Signal error because package was missing."
@@ -619,5 +622,53 @@ structure would have."
 (defun npr (n r)
   "Compute number of permutations of k elements out of n."
   (reduce #'* (loop :for i :from (max (- n r) 1) :to n :collect i) :start 1))
+
+;; Standard definition for strptime(3):
+;; https://pubs.opengroup.org/onlinepubs/9699919799/functions/strptime.html
+
+(define-alien-type nil
+  (struct tm
+    (tm-sec int)
+    (tm-min int)
+    (tm-hour int)
+    (tm-mday int)
+    (tm-mon int)
+    (tm-year int)
+    (tm-wday int)
+    (tm-yday int)
+    (tm-isdst int)
+    (tm-gmtoff long)
+    (tm-zone c-string)))
+
+(define-alien-routine ("strptime" %strptime) (* char)
+  (buf c-string)
+  (format c-string)
+  (tm (* (struct tm))))
+
+(defun strptime (date-string format-string)
+  (with-alien ((time-struct (struct tm)))
+    (setf (slot time-struct 'tm-sec) 0
+          (slot time-struct 'tm-min) 0
+          (slot time-struct 'tm-hour) 0
+          (slot time-struct 'tm-mday) 1
+          (slot time-struct 'tm-mon) 0
+          (slot time-struct 'tm-year) 0
+          (slot time-struct 'tm-isdst) -1)
+    (let ((result-ptr (%strptime date-string format-string (addr time-struct))))
+      (if (null-alien result-ptr)
+	  nil
+          (list :sec   (slot time-struct 'tm-sec)
+                :min   (slot time-struct 'tm-min)
+                :hour  (slot time-struct 'tm-hour)
+                :day   (slot time-struct 'tm-mday)
+                :month (1+ (slot time-struct 'tm-mon))      ; C months are 0-11
+                :year  (+ 1900 (slot time-struct 'tm-year)) ; C years are since 1900
+                :wday  (slot time-struct 'tm-wday))))))
+
+(eric-test:deftest strptime ()
+  (assert (equal (strptime "2026-09-27 15:42:30" "%Y-%m-%d %H:%M:%S")
+		 '(:SEC 30 :MIN 42 :HOUR 15 :DAY 27 :MONTH 9 :YEAR 2026 :WDAY 0)))
+  (assert (null (strptime "Hello" "%Y-%m-%d %H:%M:%S"))))
+
 
 (provide :eric)
