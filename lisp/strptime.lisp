@@ -10,6 +10,10 @@
   (:use :cl :sb-alien)
   (:export :strptime))
 
+(in-package :strptime)
+
+(pushnew :strptime eric-test:*silent-packages*)
+
 (define-alien-type nil
   (struct tm
     (tm-sec int)
