@@ -3,12 +3,16 @@
 ;;;; https://pubs.opengroup.org/onlinepubs/9699919799/functions/strptime.html
 
 (eval-when (:load-toplevel :compile-toplevel :execute)
-  (mapcar #'require '(:eric-test
+  (mapcar #'require '(:alexandria
+		      :eric-test
 		      :local-time)))
 
 (defpackage :strptime
-  (:use :cl :sb-alien)
-  (:export :strptime))
+  (:use :cl :alexandria :sb-alien)
+  (:export :strptime
+           :strptime-any
+           :+iso8601-day+
+   :+iso8601-datetime+))
 
 (in-package :strptime)
 
@@ -67,3 +71,23 @@
 	    2026)))
   (assert (null (strptime "Hello" "%Y-%m-%d %H:%M:%S"))))
 
+(alexandria:define-constant +iso8601-day+ "%Y-%m-%d"
+  :documentation  "ISO 8601 datestamp"
+  :test #'equal)
+(alexandria:define-constant +iso8601-datetime+ "%Y-%m-%d %H:%M:%S"
+  :documentation "ISO 8601 timestamp"
+  :test #'equal)
+
+(defun strptime-any (date-string &rest format-strings)
+  (some (lambda (fmt) (strptime date-string fmt))
+	format-strings))
+
+(eric-test:deftest strptime-any ()
+  (assert (local-time:timestamp=
+	   (local-time:encode-timestamp 0 0 0 0 2 3 2026)
+	   (strptime-any "2026/3/2"
+			 "%H:%M:%S"
+			 "%Y/%m/%d")))
+  (assert (null (strptime-any "2026"
+			      "%H:%M:%S"
+			      "%Y/%m/%d"))))

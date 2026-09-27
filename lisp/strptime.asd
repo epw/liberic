@@ -12,4 +12,4 @@
   :author "Eric Willisson"
   :description "Lisp bindings for strptime(3) and LOCAL-TIME wrapper."
   :components ((:file "strptime"))
-  :depends-on (eric-test local-time))
+  :depends-on (alexandria eric-test local-time))
